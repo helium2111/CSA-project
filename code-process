@@ -1,17 +1,126 @@
-#Initial setup 
+#Initial setup
+
 import os
+
+#PDF reading added
+
 import pdfplumber
+
+def extract_text_from_pdf(file_path):
+    text = ""
+    with pdfplumber.open(file_path) as pdf:
+        for page in pdf.pages:
+            if page.extract_text():
+                text += page.extract_text()
+    return text
+
+print("PDF extraction added")
+
+#Added Preprocessing
+
 import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 
 nltk.download('punkt')
-nltk.download('punkt_tab')   # ADD THIS LINE
+nltk.download('punkt_tab')
 nltk.download('stopwords')
+
+def preprocess(text):
+    stop_words = set(stopwords.words('english'))
+    tokens = word_tokenize(text.lower())
+
+    filtered = [
+        word for word in tokens
+        if word.isalnum() and word not in stop_words
+    ]
+
+    return " ".join(filtered)
+
+print("Preprocessing added")
+
+#Implemented TF-IDF and cosine similarity
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-nltk.download('punkt')
-nltk.download('stopwords')
 
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize 
+def compute_similarity(text1, text2):
+    vectorizer = TfidfVectorizer()
+    vectors = vectorizer.fit_transform([text1, text2])
+    return cosine_similarity(vectors[0:1], vectors[1:2])[0][0]
 
-# 
+print("Similarity model added")
+
+#Integrated full pipeline for single resume
+
+resume_text = extract_text_from_pdf("resumes/resume1.pdf")
+
+job_description = "Looking for Python developer with ML and SQL"
+
+resume_clean = preprocess(resume_text)
+job_clean = preprocess(job_description)
+
+score = compute_similarity(resume_clean, job_clean)
+
+print("Match Score:", round(score * 100, 2), "%")
+
+#Added multiple resume processing
+
+import os
+
+folder = "resumes"
+
+for file in os.listdir(folder):
+    if file.endswith(".pdf"):
+        path = os.path.join(folder, file)
+
+        resume_text = extract_text_from_pdf(path)
+        resume_clean = preprocess(resume_text)
+
+        score = compute_similarity(resume_clean, job_clean)
+
+        print(file, round(score * 100, 2), "%")
+
+#Added skill extraction with improved matching
+
+import re
+
+skills_db = {
+    "python": ["python"],
+    "machine learning": ["machine learning", "ml"],
+    "sql": ["sql"],
+    "nlp": ["nlp", "natural language processing"]
+}
+
+def extract_skills(text):
+    found = []
+
+    for skill, variations in skills_db.items():
+        for v in variations:
+            if re.search(r'\b' + re.escape(v) + r'\b', text):
+                found.append(skill)
+                break
+
+    return found
+skills = extract_skills(resume_clean)
+print("Skills:", skills)
+
+#Added external job description input
+
+def load_job_description(file):
+    with open(file, "r") as f:
+        return f.read()
+
+job_description = load_job_description("job_description.txt")
+job_clean = preprocess(job_description)
+
+#Finalized project with clean output and documentation
+
+print("\n===== Results =====\n")
+
+print(file)
+print("Score:", round(score * 100, 2), "%")
+print("Skills:", skills)
+print("-" * 30)
+
+//end
