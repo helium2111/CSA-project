@@ -68,7 +68,7 @@ resume-screening-nlp/
 ### 1. Clone the repository
 
 ```
-git clone <your-repo-link>
+git clone repo link- (https://github.com/helium2111/CSA-project.git)
 cd resume-screening-nlp
 ```
 
@@ -179,3 +179,9 @@ Due to limited time, the focus was kept on implementing core functionality rathe
 
 This project demonstrates how NLP can be applied to automate resume screening. While simple, it provides a functional and scalable solution to a real-world problem.
 
+---
+
+## Author 
+
+Nishika Deshmukh 
+25BAI11562
